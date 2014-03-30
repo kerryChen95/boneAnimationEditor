@@ -436,7 +436,9 @@ define([
                 jointX, jointY,
                 joint2MouseRotate,
                 joint2MouseVectorHori, joint2MouseVectorVert,
-                cos, sin, tan, pow;
+                cos, sin, tan,
+                pow = this._pow,
+                powerNum = pow(10, 18);
 
             // 如果没有激活骨骼，直接返回
             if( !(bone = this._activeBone) ) return;
@@ -444,8 +446,8 @@ define([
             changedData = this._boneChangedData = this._boneChangedData || {};
 
             // TODO: 先判断是否需要这些数据
-            mouseHoriVar = $event.pageX - this._mouseOldX;
-            mouseVertVar = $event.pageY - this._mouseOldY;
+            mouseHoriVar = ($event.pageX * powerNum - this._mouseOldX * powerNum) / powerNum;
+            mouseVertVar = ($event.pageY * powerNum - this._mouseOldY * powerNum) / powerNum;
             rotate = bone.rotate();
             rotateRadian = rotate * this._PI_DIV_180;
             rotateRadianToGlobal = this._parentRotateRadianToGlobal + rotateRadian;
@@ -455,7 +457,6 @@ define([
             cos = this._cos;
             sin = this._sin;
             tan = this._tan;
-            pow = this._pow;
 
 
             if(this._isMoving){
@@ -548,20 +549,25 @@ define([
             if(this._isMovingJoint){
                 // 将鼠标在水平/竖直方向上的变化量转变为x/y轴上的变化量
                 mouseXVar =
-                    mouseHoriVar * cos(rotateRadianToGlobal) +
-                    mouseVertVar * sin(rotateRadianToGlobal);
+                    mouseHoriVar * (cos(rotateRadianToGlobal) * powerNum) +
+                    mouseVertVar * (sin(rotateRadianToGlobal) * powerNum);
                 mouseYVar =
-                    mouseVertVar * cos(rotateRadianToGlobal) -
-                    mouseHoriVar * sin(rotateRadianToGlobal);
+                    mouseVertVar * (cos(rotateRadianToGlobal) * powerNum) -
+                    mouseHoriVar * (sin(rotateRadianToGlobal) * powerNum);
 
-                changedData.jointX = mouseXVar + this._jointOldX;
-                changedData.jointY = mouseYVar + this._jointOldY;
+                console.log({
+                    mouseXVar: mouseXVar,
+                    jointOldX: this._jointOldX
+                })
 
-                sinRotateRadian = sin(rotateRadian);
-                cosRotateRadian = cos(rotateRadian);
+                changedData.jointX = (mouseXVar + this._jointOldX * powerNum) / powerNum;
+                changedData.jointY = (mouseYVar + this._jointOldY * powerNum) / powerNum;
 
-                xVar = (cosRotateRadian - 1) * mouseXVar - mouseYVar * sinRotateRadian;
-                yVar = sinRotateRadian * mouseXVar + (cosRotateRadian - 1) * mouseYVar;
+                sinRotateRadian = sin(rotateRadian) * powerNum;
+                cosRotateRadian = cos(rotateRadian) * powerNum;
+
+                xVar = ( (cosRotateRadian - powerNum) / powerNum * mouseXVar - sinRotateRadian / powerNum * mouseYVar ) / powerNum;
+                yVar = ( sinRotateRadian / powerNum * mouseXVar + (cosRotateRadian - powerNum) / powerNum * mouseYVar ) / powerNum;
 
                 // 表示关节点的 `transform-origin` 属性，其坐标是相对于骨骼div在无旋转时的左上角
                 bone.jointX( changedData.jointX )
