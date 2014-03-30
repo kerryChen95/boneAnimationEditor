@@ -11,4 +11,13 @@ define([
             id = (parseInt(Math.random() * (Math.pow(10, t.toString().length) - 1)) ^ t);
         return Math.abs(id).toString(16);
     };
+
+    /*
+    判断是否空对象
+    @param {Object} obj
+    @return {Boolean}
+    */
+    exports.isEmptyObj = function(obj){
+        return !Object.keys(obj).length;
+    };
 });
