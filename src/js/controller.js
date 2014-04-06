@@ -67,7 +67,8 @@ define([
             // 有骨骼之后，先确保各个视图里已渲染出骨骼，再同步所激活的骨骼
             .once('add', handler.onceBoneCollAddModel)
             .on('add', handler.onBoneCollAddModel)
-            .on('remove', handler.onBoneCollRemoveModel);
+            .on('remove', handler.onBoneCollRemoveModel)
+            .on('invalid', handler.onBoneCollInvalid);
         actionColl
             .on('add', handler.onActionCollAddModel);
 
@@ -224,6 +225,25 @@ define([
             }, this);
 
             // TODO: 如果没有骨骼了，重新监听第一个骨骼的添加
+        },
+
+        /**
+        @triggerObj {BoneCollection} 此事件回调仅用于 `boneColl` 这个实例上
+        @event remove 当 `boneColl` 中有骨骼model的值不合法时触发
+        @param {BoneModel} boneModel
+        @param {BoneCollection} boneColl
+        @param {Object} options
+            @param {String} options.name
+            @param {String} options.texture
+            @param {String} options.parent
+        **/
+        onBoneCollInvalid: function(boneModel, boneColl, options){
+            var errorMsg = options.validationError;
+            
+            console.debug(
+                'Controller receive that bone model %s is invalid on %O, and sync to views',
+                boneModel.get('id'), errorMsg
+            );
         },
 
         /**
