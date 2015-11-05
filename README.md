@@ -1,4 +1,9 @@
-AlloyAnimation
-==============
+# boneAnimationEditor
 
-AlloyAnimation Editor 合金动画编辑器
+## How to run?
+
+```
+npm install -g anywhere
+cd ./src
+anywhere
+```
