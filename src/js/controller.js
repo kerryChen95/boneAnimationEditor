@@ -469,6 +469,7 @@ define([
             var actionModel;
 
             options = options || {};
+            options.validate = true;
 
             console.debug(
                 'Controller receive that panel %s updated action %s attributes %O, and set to model',
@@ -506,7 +507,7 @@ define([
         @param {Object} updatedBoneData 新的骨骼数据（只包含有更新的字段）
         **/
         onCertainPanelUpdatedBoneData: function(boneId, updatedBoneData){
-            var options = {},
+            var options = { validate: true },
                 keyframeData, keyframeModel;
 
             console.debug(
@@ -550,7 +551,7 @@ define([
             boneData = extractBoneData(updatedBoneData);
             // 如果有更新骨骼的字段
             if(boneData){
-                boneColl.get(boneId).set(boneData);
+                boneColl.get(boneId).set(boneData, options);
             }
         },
 
@@ -643,7 +644,7 @@ define([
         },
 
         onCertainPanelUpdatedKeyframe: function(keyframeId, updatedKeyframeData){
-            var options = {};
+            var options = { validate: true };
 
             console.debug(
                 'Controller receive that panel %s updated keyframe %s attributes %O, and set it to model',
@@ -685,6 +686,9 @@ define([
                 'Controller receive that panel %s change parent of bone %s to %s, and set to model',
                 this.panelName, changedBone, parent
             );
+
+            options = options || {};
+            options.validate = true;
 
             boneColl
                 .get(changedBone)
